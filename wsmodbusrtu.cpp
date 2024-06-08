@@ -326,7 +326,10 @@ bool WSModbusRtu::doMduInputRegisters(const QModbusDataUnit& unit)
         case RtuWriteDeviceAddr: {
             if (checkValueCount(2, unit) && unit.value(0) == 0x4000) {
                 /* set to object instance only */
-                setDeviceAddress(unit.value(1), false);
+                quint8 addr = static_cast<quint8>( //
+                   (unit.value(1) & 0x00ff));
+                /* set to object instance only */
+                setDeviceAddress(addr, false);
             }
             return true;
         }
@@ -340,7 +343,9 @@ bool WSModbusRtu::doMduHoldingRegisters(const QModbusDataUnit& unit)
         case RtuReadDeviceAddr: {
             if (checkValueCount(1, unit)) {
                 /* set to object instance only */
-                setDeviceAddress(unit.value(0), false);
+                quint8 addr = static_cast<quint8>( //
+                   (unit.value(0) & 0x00ff));
+                setDeviceAddress(addr, false);
             }
             return true;
         }
