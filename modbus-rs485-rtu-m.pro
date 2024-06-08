@@ -1,8 +1,9 @@
-###################################################################
-# Copyright EoF Software Labs. All Rights Reserved.
-# Copyright EoF Software Labs Authors.
-# SPDX-License-Identifier: MIT
-###################################################################
+#/*********************************************************************
+# * Copyright EoF Software Labs. All Rights Reserved.
+# * Copyright EoF Software Labs Authors.
+# * Written by B. Eschrich (bjoern.escrich@gmail.com)
+# * SPDX-License-Identifier: GPL v3
+# **********************************************************************/
 QT += core
 QT += gui
 QT += widgets
