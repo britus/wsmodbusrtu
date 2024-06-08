@@ -1,7 +1,7 @@
 /*********************************************************************
  * Copyright EoF Software Labs. All Rights Reserved.
  * Copyright EoF Software Labs Authors.
- * Written by B. Eschrich (bjoern.escrich@gmail.com)
+ * Written by B. Eschrich (bjoern.eschrich@gmail.com)
  * SPDX-License-Identifier: GPL v3
  **********************************************************************/
 #include <QCoreApplication>
