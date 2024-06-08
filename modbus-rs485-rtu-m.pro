@@ -67,4 +67,5 @@ target.path = /usr/local/bin
 INSTALLS += target
 
 DISTFILES += \
+	LICENSE.md \
 	README.md
