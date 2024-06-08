@@ -7,6 +7,9 @@
 
 /**
  * @brief The base class for Waveshare Modbus RTU devices
+ * This class can be used in a multi threaded app. All
+ * commands scheduled in a background queue and is fully
+ * event driven.
  */
 class WSModbusRtu: public QObject
 {

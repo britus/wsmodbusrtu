@@ -17,6 +17,12 @@
 
 class ModbusQueueWorker;
 
+/**
+ * @brief The Modbus Serial RS232/RS485 RTU client class
+ * This class can be used in a multi threaded app. All
+ * commands scheduled in a background queue and is fully
+ * event driven.
+ */
 class MBRtuClient: public QObject
 {
     Q_OBJECT
