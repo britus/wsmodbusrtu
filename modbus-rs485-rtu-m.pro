@@ -7,13 +7,9 @@ QT += core
 QT += gui
 QT += widgets
 QT += network
-QT += charts
-QT += printsupport
 QT += concurrent
 QT += serialbus
 QT += serialport
-QT += bluetooth
-QT += location
 QT += dbus
 QT += xml
 
@@ -68,3 +64,6 @@ TRANSLATIONS += \
 # Default rules for deployment.
 target.path = /usr/local/bin
 INSTALLS += target
+
+DISTFILES += \
+	README.md
