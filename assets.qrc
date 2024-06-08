@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/i18n">
+        <file>modbus-rs485-rtu-m_en_US.ts</file>
+    </qresource>
+</RCC>
