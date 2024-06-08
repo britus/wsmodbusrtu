@@ -21,7 +21,7 @@
 #define CS_EVENT(id)   ((QEvent::Type)(QEvent::User + id))
 #define CS_EVENT_ID(t) ((int) t)
 
-class ModbusQueueWorker;
+class MBQueueWorker;
 
 /**
  * @brief The Modbus Serial RS232/RS485 RTU client class
@@ -198,7 +198,7 @@ private slots:
     void onWorkerDestroyed();
 
 private:
-    friend class ModbusQueueWorker;
+    friend class MBQueueWorker;
     static const uint ID_EVENT_OPEN = 601;
     static const uint ID_EVENT_CLOSE = 602;
     static const uint ID_EVENT_READ = 603;
@@ -243,7 +243,7 @@ private:
     bool m_isOpen;
 
 private:
-    ModbusQueueWorker* m_worker;
+    MBQueueWorker* m_worker;
     inline void createWorker();
     inline void removeWorker();
     inline bool connectDevice();
@@ -253,7 +253,7 @@ private:
     inline void request(uint action, uint server, const QModbusDataUnit& unit);
 };
 
-class ModbusQueueWorker: public QThread
+class MBQueueWorker: public QThread
 {
     Q_OBJECT
 
@@ -271,8 +271,8 @@ public:
         QModbusDataUnit unit;
     } TRequest;
 
-    ModbusQueueWorker(MBRtuClient* client, QObject* parent = nullptr);
-    ~ModbusQueueWorker();
+    MBQueueWorker(MBRtuClient* client, QObject* parent = nullptr);
+    ~MBQueueWorker();
 
     void run() override;
 

@@ -102,7 +102,7 @@ void MBRtuClient::read(const uint server, const QModbusDataUnit& unit)
     }
     else {
         m_worker->scheduleRequest({
-           .type = ModbusQueueWorker::DataUnitRead,
+           .type = MBQueueWorker::DataUnitRead,
            .server = server,
            .request = {},
            // .unit = QModbusDataUnit(unit.registerType(), unit.startAddress(), unit.values()),
@@ -119,7 +119,7 @@ void MBRtuClient::write(const uint server, const QModbusDataUnit& unit)
     }
     else {
         m_worker->scheduleRequest({
-           .type = ModbusQueueWorker::DataUnitWrite,
+           .type = MBQueueWorker::DataUnitWrite,
            .server = server,
            .request = {},
            //.unit = QModbusDataUnit(unit.registerType(), unit.startAddress(), unit.values()),
@@ -136,7 +136,7 @@ void MBRtuClient::send(const uint server, const QModbusRequest& mr)
     }
     else {
         m_worker->scheduleRequest({
-           .type = ModbusQueueWorker::RequestSend,
+           .type = MBQueueWorker::RequestSend,
            .server = server,
            //.request = QModbusRequest(mr),
            .request = mr,
@@ -243,10 +243,10 @@ bool MBRtuClient::isTrace(uint mask) const
 inline void MBRtuClient::createWorker()
 {
     if (!m_worker) {
-        m_worker = new ModbusQueueWorker(this, this);
-        connect(m_worker, &ModbusQueueWorker::started, this, &MBRtuClient::onWorkerStarted);
-        connect(m_worker, &ModbusQueueWorker::finished, this, &MBRtuClient::onWorkerFinished);
-        connect(m_worker, &ModbusQueueWorker::destroyed, this, &MBRtuClient::onWorkerDestroyed);
+        m_worker = new MBQueueWorker(this, this);
+        connect(m_worker, &MBQueueWorker::started, this, &MBRtuClient::onWorkerStarted);
+        connect(m_worker, &MBQueueWorker::finished, this, &MBRtuClient::onWorkerFinished);
+        connect(m_worker, &MBQueueWorker::destroyed, this, &MBRtuClient::onWorkerDestroyed);
         m_worker->start(QThread::HighPriority);
     }
 }
@@ -563,12 +563,11 @@ void MBRtuClient::onModbusReply()
         return;
     }
 
-    QStringList dump;
-    for (qint16 i = 0; i < resp.dataSize(); i++) {
-        dump << tr("0x%1").arg(resp.data().at(i), 2, 16, QChar('0'));
-    }
-
     if (isTrace(TRACE_RESPONSE | TRACE_INTERNAL)) {
+        QStringList dump;
+        for (qint16 i = 0; i < resp.dataSize(); i++) {
+            dump << tr("0x%1").arg(resp.data().at(i), 2, 16, QChar('0'));
+        }
         qDebug() << "MODBUS: Response"                        //
                  << "Func:" << Qt::hex << resp.functionCode() //
                  << "Size:" << Qt::dec << resp.dataSize()     //
@@ -734,7 +733,7 @@ void MBRtuClient::onWorkerDestroyed()
  * WorkerThread
  * -------------------------------------------------------------------- */
 
-ModbusQueueWorker::ModbusQueueWorker(MBRtuClient* client, QObject* parent)
+MBQueueWorker::MBQueueWorker(MBRtuClient* client, QObject* parent)
     : QThread(parent)
     , m_client(client)
     , m_queue()
@@ -747,7 +746,7 @@ ModbusQueueWorker::ModbusQueueWorker(MBRtuClient* client, QObject* parent)
 {
 }
 
-ModbusQueueWorker::~ModbusQueueWorker()
+MBQueueWorker::~MBQueueWorker()
 {
     qDebug() << Q_FUNC_INFO;
 
@@ -760,40 +759,40 @@ ModbusQueueWorker::~ModbusQueueWorker()
     }
 }
 
-void ModbusQueueWorker::clearQueue()
+void MBQueueWorker::clearQueue()
 {
     QMutexLocker lock(&m_queueLock);
     m_queue.clear();
 }
 
-void ModbusQueueWorker::scheduleRequest(const TRequest& request)
+void MBQueueWorker::scheduleRequest(const TRequest& request)
 {
     QMutexLocker lock(&m_queueLock);
     m_queue.append(request);
 }
 
-void ModbusQueueWorker::notifyRequest()
+void MBQueueWorker::notifyRequest()
 {
     m_queueWait.wakeOne();
 }
 
-void ModbusQueueWorker::notifyResponse()
+void MBQueueWorker::notifyResponse()
 {
     m_responseWait.wakeOne();
 }
 
-uint ModbusQueueWorker::activeServer()
+uint MBQueueWorker::activeServer()
 {
     return m_pendingRequest.server;
 }
 
-inline bool ModbusQueueWorker::isQueueEmpty()
+inline bool MBQueueWorker::isQueueEmpty()
 {
     QMutexLocker lock(&m_queueLock);
     return m_queue.isEmpty();
 }
 
-inline void ModbusQueueWorker::sendRequest()
+inline void MBQueueWorker::sendRequest()
 {
     QMutexLocker lock(&m_queueLock);
 
@@ -829,7 +828,7 @@ inline void ModbusQueueWorker::sendRequest()
     }
 }
 
-inline bool ModbusQueueWorker::waitForRequests()
+inline bool MBQueueWorker::waitForRequests()
 {
     QMutexLocker lock(&m_queueWaitLock);
     m_queueWait.wait(&m_queueWaitLock);
@@ -842,7 +841,7 @@ inline bool ModbusQueueWorker::waitForRequests()
     return true;
 }
 
-inline bool ModbusQueueWorker::waitForResponse()
+inline bool MBQueueWorker::waitForResponse()
 {
     QMutexLocker lock(&m_responseWaitLock);
 
@@ -859,7 +858,7 @@ inline bool ModbusQueueWorker::waitForResponse()
     return true;
 }
 
-void ModbusQueueWorker::run()
+void MBQueueWorker::run()
 {
     if (m_client->isTrace(MBRtuClient::TRACE_INTERNAL)) {
         qDebug() << "MODBUS: Worker run enter.";
