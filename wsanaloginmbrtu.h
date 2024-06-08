@@ -5,6 +5,9 @@
 #include <mbrtuclient.h>
 #include <wsmodbusrtu.h>
 
+/**
+ * @brief The Modbus RTU Analog Input 8CH driver class
+ */
 class WSAnalogInMbRtu: public WSModbusRtu
 {
     Q_OBJECT

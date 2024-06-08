@@ -8,7 +8,7 @@
 #include <wsmodbusrtu.h>
 
 /**
- * @brief The relay driver for Waveshare Modbus RTU (D)
+ * @brief The relay / digital input driver class for Waveshare Modbus RTU (D)
  */
 class WSRelayDigInMbRtu: public WSModbusRtu
 {

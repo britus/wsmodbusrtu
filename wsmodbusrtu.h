@@ -5,6 +5,9 @@
 #include <QWidget>
 #include <mbrtuclient.h>
 
+/**
+ * @brief The base class for Waveshare Modbus RTU devices
+ */
 class WSModbusRtu: public QObject
 {
     Q_OBJECT

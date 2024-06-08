@@ -1,4 +1,3 @@
-#include "mbrtuclient.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -6,6 +5,7 @@
 #include <QMutexLocker>
 #include <QSerialPortInfo>
 #include <QTimer>
+#include <mbrtuclient.h>
 
 MBRtuClient::MBRtuClient(QObject* parent)
     : QObject {parent}
