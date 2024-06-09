@@ -175,6 +175,9 @@ MainWindow::MainWindow(QWidget* parent)
     ui->pbSetBaudRate->setEnabled(false);
     ui->pbSetDevAddr->setEnabled(false);
 
+    ui->pbOpenPort->setEnabled(true);
+    ui->pbClosePort->setEnabled(false);
+
     ui->pgRelayAndDigIn->setEnabled(false);
     ui->pgAnalogInRtu->setEnabled(false);
     ui->pgRenogyRtu->setEnabled(false);
@@ -217,7 +220,8 @@ inline void MainWindow::setRelay(quint8 relay)
 
 void MainWindow::onRelayDriverOpend()
 {
-    ui->pbOpen->setEnabled(false);
+    ui->pbOpenPort->setEnabled(false);
+    ui->pbClosePort->setEnabled(true);
     ui->pbSetLinkControl->setEnabled(true);
     ui->cbxUpdateDevice->setEnabled(true);
     ui->pnlRelay->setEnabled(true);
@@ -228,7 +232,8 @@ void MainWindow::onRelayDriverOpend()
 
 void MainWindow::onRelayDriverClosed()
 {
-    ui->pbOpen->setEnabled(true);
+    ui->pbOpenPort->setEnabled(true);
+    ui->pbClosePort->setEnabled(false);
     ui->pbSetLinkControl->setEnabled(false);
     /* remove driver instance */
     m_rly->deleteLater();
@@ -294,7 +299,8 @@ void MainWindow::onDigInChanged(quint8 channel, bool state)
 
 void MainWindow::onAdcDriverOpend()
 {
-    ui->pbOpenAnalog->setEnabled(false);
+    ui->pbOpenPort->setEnabled(false);
+    ui->pbClosePort->setEnabled(true);
     ui->pbSetChannelType->setEnabled(true);
     /* update page */
     on_cbDeviceList_activated(1);
@@ -303,7 +309,8 @@ void MainWindow::onAdcDriverOpend()
 
 void MainWindow::onAdcDriverClosed()
 {
-    ui->pbOpenAnalog->setEnabled(true);
+    ui->pbOpenPort->setEnabled(true);
+    ui->pbClosePort->setEnabled(false);
     ui->pbSetChannelType->setEnabled(false);
     /* remove driver instance */
     m_adc->deleteLater();
@@ -683,5 +690,19 @@ void MainWindow::on_pbSetChannelType_clicked()
             //
         }
         dlg->deleteLater();
+    }
+}
+
+void MainWindow::on_pbOpenPort_clicked()
+{
+    if (!m_modbus.isOpen()) {
+        m_modbus.open();
+    }
+}
+
+void MainWindow::on_pbClosePort_clicked()
+{
+    if (m_modbus.isOpen()) {
+        m_modbus.close();
     }
 }
