@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget* parent)
     , m_adc(nullptr)
     , m_chg(nullptr)
 {
+    qDebug() << "APPWND: Config file:" << m_settings.fileName();
+
     ui->setupUi(this);
 
     connect(qApp, &QApplication::aboutToQuit, this, &MainWindow::onAppQuit);
