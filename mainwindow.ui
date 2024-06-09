@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QToolBox" name="toolBox">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pgSettings">
        <property name="geometry">
@@ -825,21 +825,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -859,21 +859,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -893,21 +893,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -927,21 +927,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -1019,21 +1019,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -1095,21 +1095,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -1129,21 +1129,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
@@ -1186,21 +1186,21 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>132</width>
-               <height>48</height>
+               <width>164</width>
+               <height>52</height>
               </size>
              </property>
              <property name="smallDecimalPoint">
               <bool>true</bool>
              </property>
              <property name="digitCount">
-              <number>4</number>
+              <number>6</number>
              </property>
              <property name="segmentStyle">
               <enum>QLCDNumber::Flat</enum>
