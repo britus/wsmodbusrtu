@@ -285,7 +285,7 @@ void MainWindow::onDigInChanged(quint8 channel, bool state)
 
     QCheckBox* cbx;
     QString key = tr("cbxChannel%1").arg(channel + 1);
-    if ((cbx = ui->pnlAnalogIn->findChild<QCheckBox*>(key))) {
+    if ((cbx = ui->pnlDigitalIn->findChild<QCheckBox*>(key))) {
         cbx->setChecked(state);
     }
 }
