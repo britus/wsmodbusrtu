@@ -75,7 +75,6 @@ private slots:
     void on_pbSetChannelType_clicked();
     void on_pbEnableDevice_clicked();
     void on_cbDeviceList_activated(int index);
-    void on_cbDeviceType_activated(int index);
     void on_pbOpenPort_clicked();
     void on_pbClosePort_clicked();
 

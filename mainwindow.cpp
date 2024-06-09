@@ -180,21 +180,17 @@ MainWindow::MainWindow(QWidget* parent)
     };
 
     selected = -1;
-    ui->cbDeviceType->clear();
     ui->cbDeviceList->clear();
     for (int i = 0; i < 3; i++) {
-        ui->cbDeviceType->addItem(devices[i].name, QVariant::fromValue(devices[i].index));
         ui->cbDeviceList->addItem(devices[i].name, QVariant::fromValue(devices[i].index));
         if (m_config.selDev == i) {
             selected = i;
         }
     }
     if (selected > -1) {
-        ui->cbDeviceType->setCurrentIndex(selected);
         ui->cbDeviceList->setCurrentIndex(selected);
     }
     else {
-        ui->cbDeviceType->setCurrentIndex(0);
         ui->cbDeviceList->setCurrentIndex(0);
     }
 
@@ -340,9 +336,7 @@ void MainWindow::onRelayDriverOpend()
     ui->pbSetLinkControl->setEnabled(true);
     ui->cbxUpdateDevice->setEnabled(true);
     ui->pnlRelay->setEnabled(true);
-    /* update page */
     on_cbDeviceList_activated(0);
-    on_cbDeviceType_activated(0);
 }
 
 void MainWindow::onRelayDriverClosed()
@@ -350,9 +344,7 @@ void MainWindow::onRelayDriverClosed()
     ui->pbOpenPort->setEnabled(true);
     ui->pbClosePort->setEnabled(false);
     ui->pbSetLinkControl->setEnabled(false);
-    /* update page */
     on_cbDeviceList_activated(0);
-    on_cbDeviceType_activated(0);
 }
 
 void MainWindow::onRelayFunctionDone(uint function)
@@ -414,9 +406,7 @@ void MainWindow::onAdcDriverOpend()
     ui->pbOpenPort->setEnabled(false);
     ui->pbClosePort->setEnabled(true);
     ui->pbSetChannelType->setEnabled(true);
-    /* update page */
     on_cbDeviceList_activated(1);
-    on_cbDeviceType_activated(1);
 }
 
 void MainWindow::onAdcDriverClosed()
@@ -424,9 +414,7 @@ void MainWindow::onAdcDriverClosed()
     ui->pbOpenPort->setEnabled(true);
     ui->pbClosePort->setEnabled(false);
     ui->pbSetChannelType->setEnabled(false);
-    /* update page */
     on_cbDeviceList_activated(1);
-    on_cbDeviceType_activated(1);
 }
 
 void MainWindow::onAdcFunctionDone(uint function)
@@ -484,7 +472,6 @@ void MainWindow::on_pbEnableDevice_clicked()
             onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
             onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
             on_cbDeviceList_activated(ui->cbDeviceList->currentIndex());
-            on_cbDeviceType_activated(ui->cbDeviceType->currentIndex());
             ui->pnlRelay->setEnabled(m_rly->isValidModbus());
             ui->pbSetLinkControl->setEnabled(m_rly->isValidModbus());
             if (m_modbus.isOpen()) {
@@ -511,7 +498,6 @@ void MainWindow::on_pbEnableDevice_clicked()
             onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
             onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
             on_cbDeviceList_activated(ui->cbDeviceList->currentIndex());
-            on_cbDeviceType_activated(ui->cbDeviceType->currentIndex());
             ui->pbSetChannelType->setEnabled(m_adc->isValidModbus());
             if (m_modbus.isOpen()) {
                 m_adc->open();
@@ -520,7 +506,6 @@ void MainWindow::on_pbEnableDevice_clicked()
         }
         case 3: {
             on_cbDeviceList_activated(ui->cbDeviceList->currentIndex());
-            on_cbDeviceType_activated(ui->cbDeviceType->currentIndex());
             break;
         }
     }
@@ -528,8 +513,6 @@ void MainWindow::on_pbEnableDevice_clicked()
 
 void MainWindow::on_cbDeviceList_activated(int index)
 {
-    ui->cbDeviceType->setCurrentIndex(index);
-
     QVariant vd = ui->cbDeviceList->itemData(index);
     if (vd.isNull() || !vd.isValid()) {
         return;
@@ -546,7 +529,11 @@ void MainWindow::on_cbDeviceList_activated(int index)
             ui->gbxParameters->setEnabled(m_rly != nullptr);
             ui->gbxDevUpdate->setEnabled(m_rly != nullptr);
             ui->pnlSetButtons->setEnabled(m_rly != nullptr);
+            ui->pbSetBaudRate->setEnabled(m_rly != nullptr);
+            ui->pbSetDevAddr->setEnabled(m_rly != nullptr);
             if (m_rly) {
+                ui->cbxUpdateDevice->setEnabled( //
+                   m_rly != nullptr && m_rly->isValidModbus());
                 onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
                 onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
             }
@@ -558,7 +545,11 @@ void MainWindow::on_cbDeviceList_activated(int index)
             ui->gbxParameters->setEnabled(m_adc != nullptr);
             ui->gbxDevUpdate->setEnabled(m_adc != nullptr);
             ui->pnlSetButtons->setEnabled(m_adc != nullptr);
+            ui->pbSetBaudRate->setEnabled(m_adc != nullptr);
+            ui->pbSetDevAddr->setEnabled(m_adc != nullptr);
             if (m_adc) {
+                ui->cbxUpdateDevice->setEnabled( //
+                   m_adc != nullptr && m_adc->isValidModbus());
                 onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
                 onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
             }
@@ -570,6 +561,9 @@ void MainWindow::on_cbDeviceList_activated(int index)
             ui->gbxParameters->setEnabled(m_chg != nullptr);
             ui->gbxDevUpdate->setEnabled(m_chg != nullptr);
             ui->pnlSetButtons->setEnabled(m_chg != nullptr);
+            ui->cbxUpdateDevice->setEnabled(m_chg != nullptr);
+            ui->pbSetBaudRate->setEnabled(m_chg != nullptr);
+            ui->pbSetDevAddr->setEnabled(m_chg != nullptr);
             break;
         }
     }
@@ -581,39 +575,9 @@ void MainWindow::on_edDevAddr_valueChanged(int arg1)
     m_devAddress = arg1;
 }
 
-void MainWindow::on_cbDeviceType_activated(int index)
-{
-    QVariant vd = ui->cbDeviceType->itemData(index);
-    if (vd.isNull() || !vd.isValid()) {
-        return;
-    }
-    switch (vd.value<int>()) {
-        case 1: {
-            ui->cbxUpdateDevice->setEnabled( //
-               m_rly != nullptr && m_rly->isValidModbus());
-            ui->pbSetBaudRate->setEnabled(m_rly != nullptr);
-            ui->pbSetDevAddr->setEnabled(m_rly != nullptr);
-            break;
-        }
-        case 2: {
-            ui->cbxUpdateDevice->setEnabled( //
-               m_adc != nullptr && m_adc->isValidModbus());
-            ui->pbSetBaudRate->setEnabled(m_adc != nullptr);
-            ui->pbSetDevAddr->setEnabled(m_adc != nullptr);
-            break;
-        }
-        case 3: {
-            ui->cbxUpdateDevice->setEnabled(m_chg != nullptr);
-            ui->pbSetBaudRate->setEnabled(m_chg != nullptr);
-            ui->pbSetDevAddr->setEnabled(m_chg != nullptr);
-            break;
-        }
-    }
-}
-
 void MainWindow::on_pbSetDevAddr_clicked()
 {
-    QVariant v = ui->cbDeviceType->currentData();
+    QVariant v = ui->cbDeviceList->currentData();
     if (v.isNull() || !v.isValid()) {
         return;
     }
@@ -645,7 +609,7 @@ void MainWindow::on_pbSetDevAddr_clicked()
 
 void MainWindow::on_pbSetBaudRate_clicked()
 {
-    QVariant vd = ui->cbDeviceType->currentData();
+    QVariant vd = ui->cbDeviceList->currentData();
     if (vd.isNull() || !vd.isValid()) {
         return;
     }
@@ -704,6 +668,11 @@ void MainWindow::on_pbSetBaudRate_clicked()
             break;
         }
         case 3: {
+            m_modbus.setPortName(m_config.mbconf.m_portName);
+            m_modbus.setDataBits(m_config.mbconf.m_dataBits);
+            m_modbus.setStopBits(m_config.mbconf.m_stopBits);
+            m_modbus.setBaudRate(m_config.mbconf.m_baudRate);
+            m_modbus.setParity(m_config.mbconf.m_parity);
             if (m_chg) {
             }
             break;

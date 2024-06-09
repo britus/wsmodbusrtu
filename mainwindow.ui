@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QToolBox" name="toolBox">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="pgSettings">
        <property name="geometry">
@@ -240,51 +240,6 @@
                <number>24</number>
               </property>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_14">
-                <property name="text">
-                 <string>Device Type:</string>
-                </property>
-                <property name="buddy">
-                 <cstring>cbDeviceType</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="cbDeviceType">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>1: Waveshare Modbus RTU Relay (D)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>2: Waveshare Modbus RTU AnalogIn (8CH)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>3: Renogy MPPT Solar Controller</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_15">
-                <property name="text">
-                 <string>Update device</string>
-                </property>
-                <property name="buddy">
-                 <cstring>cbxUpdateDevice</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
                <widget class="QCheckBox" name="cbxUpdateDevice">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -293,7 +248,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Write Parameter to device</string>
+                 <string>Write Parameter to RTU device</string>
                 </property>
                </widget>
               </item>
@@ -1342,7 +1297,6 @@
   <tabstop>cbStopBits</tabstop>
   <tabstop>cbParity</tabstop>
   <tabstop>edDevAddr</tabstop>
-  <tabstop>cbDeviceType</tabstop>
   <tabstop>cbxUpdateDevice</tabstop>
   <tabstop>pbOpenPort</tabstop>
   <tabstop>pbClosePort</tabstop>
