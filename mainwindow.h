@@ -58,7 +58,6 @@ private slots:
 
 private slots:
     void on_edDevAddr_valueChanged(int arg1);
-    void on_pbOpen_clicked();
     void on_pbR1_clicked();
     void on_pbR2_clicked();
     void on_pbR3_clicked();
@@ -72,13 +71,12 @@ private slots:
     void on_pbSetBaudRate_clicked();
     void on_pbToggleRelays_clicked();
     void on_pbSetLinkControl_clicked();
-    void on_pbOpenAnalog_clicked();
     void on_pbSetChannelType_clicked();
     void on_pbEnableDevice_clicked();
-
     void on_cbDeviceList_activated(int index);
-
     void on_cbDeviceType_activated(int index);
+    void on_pbOpenPort_clicked();
+    void on_pbClosePort_clicked();
 
 private:
     Ui::MainWindow* ui;

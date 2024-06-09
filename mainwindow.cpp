@@ -587,13 +587,6 @@ void MainWindow::on_pbSetBaudRate_clicked()
     }
 }
 
-void MainWindow::on_pbOpen_clicked()
-{
-    if (m_rly) {
-        m_rly->open();
-    }
-}
-
 void MainWindow::on_pbR1_clicked()
 {
     setRelay(0);
@@ -669,13 +662,6 @@ void MainWindow::on_pbToggleRelays_clicked()
         }
 
         m_rly->setAllRelays(mask);
-    }
-}
-
-void MainWindow::on_pbOpenAnalog_clicked()
-{
-    if (m_adc) {
-        m_adc->open();
     }
 }
 
