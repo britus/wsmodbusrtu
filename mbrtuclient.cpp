@@ -80,6 +80,11 @@ void MBRtuClient::customEvent(QEvent* event)
  * API Methods
  * -------------------------------------------------------------------- */
 
+const MBRtuClient::TConfig& MBRtuClient::config() const
+{
+    return m_config;
+}
+
 bool MBRtuClient::isOpen() const
 {
     return m_isOpen;

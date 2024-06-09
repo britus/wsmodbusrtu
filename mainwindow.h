@@ -6,6 +6,7 @@
  **********************************************************************/
 #pragma once
 #include <QMainWindow>
+#include <QSettings>
 #include <mbrtuclient.h>
 #include <wsanaloginmbrtu.h>
 #include <wsrelaydiginmbrtu.h>
@@ -79,7 +80,16 @@ private slots:
     void on_pbClosePort_clicked();
 
 private:
+    typedef struct {
+        MBRtuClient::TConfig mbconf;
+        quint8 rlyAddr;
+        quint8 adcAddr;
+        quint8 selDev;
+    } TConfig;
+
     Ui::MainWindow* ui;
+    QSettings m_settings;
+    TConfig m_config;
     MBRtuClient m_modbus;
     WSRelayDigInMbRtu* m_rly;
     WSAnalogInMbRtu* m_adc;
@@ -87,4 +97,6 @@ private:
     quint16 m_devAddress;
 
     inline void setRelay(quint8 relay);
+    inline void loadConfig();
+    inline void saveConfig();
 };

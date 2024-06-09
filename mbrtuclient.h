@@ -65,6 +65,11 @@ public:
      */
     void customEvent(QEvent* event) override;
     /**
+     * @brief config
+     * @return
+     */
+    const TConfig& config() const;
+    /**
      * @brief isOpen
      * @return
      */

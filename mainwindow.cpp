@@ -7,8 +7,11 @@
 #include "ui_mainwindow.h"
 #include <QApplication>
 #include <QDebug>
+#include <QDir>
 #include <QModbusDataUnit>
 #include <QSerialPortInfo>
+#include <QSettings>
+#include <QStandardPaths>
 #include <dlgadcindatatype.h>
 #include <dlgrelaylinkcontrol.h>
 #include <mainwindow.h>
@@ -19,9 +22,21 @@ Q_DECLARE_METATYPE(QSerialPort::DataBits)
 Q_DECLARE_METATYPE(QSerialPort::StopBits)
 Q_DECLARE_METATYPE(QSerialPort::Parity)
 
+static const QString configFile()
+{
+    return QStringLiteral("%1%2%3") //
+       .arg(
+          QStandardPaths::writableLocation( //
+             QStandardPaths::AppConfigLocation),
+          QDir::separator(),
+          "wsmodbusrtu.conf");
+}
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_settings(configFile(), QSettings::IniFormat, this)
+    , m_config()
     , m_modbus(this)
     , m_rly(nullptr)
     , m_adc(nullptr)
@@ -31,6 +46,11 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(qApp, &QApplication::aboutToQuit, this, &MainWindow::onAppQuit);
 
+    m_config.mbconf = m_modbus.config();
+    m_config.rlyAddr = 1;
+    m_config.adcAddr = 1;
+    loadConfig();
+
     const QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     int selected = -1;
 
@@ -38,7 +58,7 @@ MainWindow::MainWindow(QWidget* parent)
     ui->cbComPort->clear();
     for (int i = 0; i < ports.count(); i++) {
         ui->cbComPort->addItem(ports[i].portName(), QVariant::fromValue(ports[i]));
-        if (ports[i].portName().contains(m_modbus.portName())) {
+        if (ports[i].portName().contains(m_config.mbconf.m_portName)) {
             selected = i;
         }
     }
@@ -66,7 +86,7 @@ MainWindow::MainWindow(QWidget* parent)
     ui->cbBaudRate->clear();
     for (int i = 0; i < 8; i++) {
         ui->cbBaudRate->addItem(baudRates[i].name, QVariant::fromValue(baudRates[i].baud));
-        if (m_modbus.baudRate() == baudRates[i].baud) {
+        if (m_config.mbconf.m_baudRate == baudRates[i].baud) {
             selected = i;
         }
     }
@@ -90,7 +110,7 @@ MainWindow::MainWindow(QWidget* parent)
     ui->cbDataBits->clear();
     for (int i = 0; i < 4; i++) {
         ui->cbDataBits->addItem(dataBits[i].name, QVariant::fromValue(dataBits[i].bits));
-        if (m_modbus.dataBits() == dataBits[i].bits) {
+        if (m_config.mbconf.m_dataBits == dataBits[i].bits) {
             selected = i;
         }
     }
@@ -113,7 +133,7 @@ MainWindow::MainWindow(QWidget* parent)
     ui->cbStopBits->clear();
     for (int i = 0; i < 3; i++) {
         ui->cbStopBits->addItem(stopBits[i].name, QVariant::fromValue(stopBits[i].bits));
-        if (m_modbus.stopBits() == stopBits[i].bits) {
+        if (m_config.mbconf.m_stopBits == stopBits[i].bits) {
             selected = i;
         }
     }
@@ -138,7 +158,7 @@ MainWindow::MainWindow(QWidget* parent)
     ui->cbParity->clear();
     for (int i = 0; i < 5; i++) {
         ui->cbParity->addItem(parity[i].name, QVariant::fromValue(parity[i].parity));
-        if (m_modbus.parity() == parity[i].parity) {
+        if (m_config.mbconf.m_parity == parity[i].parity) {
             selected = i;
         }
     }
@@ -157,14 +177,24 @@ MainWindow::MainWindow(QWidget* parent)
        {tr("Renogy MPPT Solar Controller"), 3},
     };
 
+    selected = -1;
     ui->cbDeviceType->clear();
     ui->cbDeviceList->clear();
     for (int i = 0; i < 3; i++) {
         ui->cbDeviceType->addItem(devices[i].name, QVariant::fromValue(devices[i].index));
         ui->cbDeviceList->addItem(devices[i].name, QVariant::fromValue(devices[i].index));
+        if (m_config.selDev == i) {
+            selected = i;
+        }
     }
-    ui->cbDeviceType->setCurrentIndex(0);
-    ui->cbDeviceList->setCurrentIndex(0);
+    if (selected > -1) {
+        ui->cbDeviceType->setCurrentIndex(selected);
+        ui->cbDeviceList->setCurrentIndex(selected);
+    }
+    else {
+        ui->cbDeviceType->setCurrentIndex(0);
+        ui->cbDeviceList->setCurrentIndex(0);
+    }
 
     ui->gbxParameters->setEnabled(false);
     ui->gbxDevUpdate->setEnabled(false);
@@ -193,17 +223,100 @@ MainWindow::~MainWindow()
 
 void MainWindow::onAppQuit()
 {
+    m_modbus.close();
+
     if (m_rly) {
         m_rly->close();
         m_rly->deleteLater();
         m_rly = nullptr;
     }
+
     if (m_adc) {
         m_adc->close();
         m_adc->deleteLater();
         m_adc = nullptr;
     }
-    m_modbus.close();
+
+    saveConfig();
+}
+
+inline void MainWindow::loadConfig()
+{
+    QString str;
+    uint value;
+    bool numOk;
+
+    m_settings.beginGroup("modbus");
+    value = m_config.mbconf.m_baudRate;
+    value = m_settings.value("baudRate", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.mbconf.m_baudRate = //
+           static_cast<QSerialPort::BaudRate>(value);
+    }
+
+    value = m_config.mbconf.m_dataBits;
+    value = m_settings.value("dataBits", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.mbconf.m_dataBits = //
+           static_cast<QSerialPort::DataBits>(value);
+    }
+
+    value = m_config.mbconf.m_stopBits;
+    value = m_settings.value("stopBits", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.mbconf.m_stopBits = //
+           static_cast<QSerialPort::StopBits>(value);
+    }
+
+    value = m_config.mbconf.m_parity;
+    value = m_settings.value("parity", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.mbconf.m_parity = //
+           static_cast<QSerialPort::Parity>(value);
+    }
+
+    str = m_config.mbconf.m_portName;
+    str = m_settings.value("port", value).toString();
+    if (!str.isEmpty()) {
+        m_config.mbconf.m_portName = str;
+    }
+    m_settings.endGroup();
+
+    m_settings.beginGroup("devices");
+    value = m_config.rlyAddr;
+    value = m_settings.value("rlyAddr", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.rlyAddr = value;
+    }
+    value = m_config.adcAddr;
+    value = m_settings.value("adcAddr", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.adcAddr = value;
+    }
+    value = m_config.selDev;
+    value = m_settings.value("selDev", value).toUInt(&numOk);
+    if (numOk) {
+        m_config.selDev = value;
+    }
+    m_settings.endGroup();
+}
+
+inline void MainWindow::saveConfig()
+{
+    m_settings.beginGroup("modbus");
+    m_settings.setValue("baudRate", m_config.mbconf.m_baudRate);
+    m_settings.setValue("dataBits", m_config.mbconf.m_dataBits);
+    m_settings.setValue("stopBits", m_config.mbconf.m_stopBits);
+    m_settings.setValue("parity", m_config.mbconf.m_parity);
+    m_settings.setValue("port", m_config.mbconf.m_portName);
+    m_settings.endGroup();
+
+    m_settings.beginGroup("devices");
+    m_settings.setValue("rlyAddr", m_config.rlyAddr);
+    m_settings.setValue("adcAddr", m_config.adcAddr);
+    m_settings.setValue("selDev", m_config.selDev);
+    m_settings.endGroup();
+    m_settings.sync();
 }
 
 // Relay Driver ---------------------------------------------------
@@ -235,9 +348,6 @@ void MainWindow::onRelayDriverClosed()
     ui->pbOpenPort->setEnabled(true);
     ui->pbClosePort->setEnabled(false);
     ui->pbSetLinkControl->setEnabled(false);
-    /* remove driver instance */
-    m_rly->deleteLater();
-    m_rly = nullptr;
     /* update page */
     on_cbDeviceList_activated(0);
     on_cbDeviceType_activated(0);
@@ -312,9 +422,6 @@ void MainWindow::onAdcDriverClosed()
     ui->pbOpenPort->setEnabled(true);
     ui->pbClosePort->setEnabled(false);
     ui->pbSetChannelType->setEnabled(false);
-    /* remove driver instance */
-    m_adc->deleteLater();
-    m_adc = nullptr;
     /* update page */
     on_cbDeviceList_activated(1);
     on_cbDeviceType_activated(1);
@@ -365,6 +472,7 @@ void MainWindow::on_pbEnableDevice_clicked()
                 return;
             }
             m_rly = new WSRelayDigInMbRtu(&m_modbus, this);
+            m_rly->setDeviceAddress(m_config.rlyAddr, false);
             connect(m_rly, &WSRelayDigInMbRtu::opened, this, &MainWindow::onRelayDriverOpend);
             connect(m_rly, &WSRelayDigInMbRtu::closed, this, &MainWindow::onRelayDriverClosed);
             connect(m_rly, &WSRelayDigInMbRtu::complete, this, &MainWindow::onRelayFunctionDone);
@@ -377,6 +485,9 @@ void MainWindow::on_pbEnableDevice_clicked()
             on_cbDeviceType_activated(ui->cbDeviceType->currentIndex());
             ui->pnlRelay->setEnabled(m_rly->isValidModbus());
             ui->pbSetLinkControl->setEnabled(m_rly->isValidModbus());
+            if (m_modbus.isOpen()) {
+                m_rly->open();
+            }
             break;
         }
         case 2: {
@@ -389,6 +500,7 @@ void MainWindow::on_pbEnableDevice_clicked()
             }
             /* AnalogIn driver */
             m_adc = new WSAnalogInMbRtu(&m_modbus, this);
+            m_adc->setDeviceAddress(m_config.adcAddr, false);
             connect(m_adc, &WSAnalogInMbRtu::opened, this, &MainWindow::onAdcDriverOpend);
             connect(m_adc, &WSAnalogInMbRtu::closed, this, &MainWindow::onAdcDriverClosed);
             connect(m_adc, &WSAnalogInMbRtu::complete, this, &MainWindow::onAdcFunctionDone);
@@ -399,6 +511,9 @@ void MainWindow::on_pbEnableDevice_clicked()
             on_cbDeviceList_activated(ui->cbDeviceList->currentIndex());
             on_cbDeviceType_activated(ui->cbDeviceType->currentIndex());
             ui->pbSetChannelType->setEnabled(m_adc->isValidModbus());
+            if (m_modbus.isOpen()) {
+                m_adc->open();
+            }
             break;
         }
         case 3: {
@@ -417,6 +532,10 @@ void MainWindow::on_cbDeviceList_activated(int index)
     if (vd.isNull() || !vd.isValid()) {
         return;
     }
+
+    m_config.selDev = index;
+    saveConfig();
+
     QString pfx;
     switch (vd.value<int>()) {
         case 1: {
@@ -501,12 +620,14 @@ void MainWindow::on_pbSetDevAddr_clicked()
 
     switch (v.value<int>()) {
         case 1: {
+            m_config.rlyAddr = m_devAddress;
             if (m_rly) {
                 m_rly->setDeviceAddress(m_devAddress, update);
             }
             break;
         }
         case 2: {
+            m_config.adcAddr = m_devAddress;
             if (m_adc) {
                 m_adc->setDeviceAddress(m_devAddress, update);
             }
@@ -516,6 +637,8 @@ void MainWindow::on_pbSetDevAddr_clicked()
             break;
         }
     }
+
+    saveConfig();
 }
 
 void MainWindow::on_pbSetBaudRate_clicked()
@@ -550,32 +673,31 @@ void MainWindow::on_pbSetBaudRate_clicked()
         return;
     }
 
-    QString portName = vcp.value<QSerialPortInfo>().portName();
-    QSerialPort::BaudRate rate = vb.value<QSerialPort::BaudRate>();
-    QSerialPort::DataBits dataBits = vdb.value<QSerialPort::DataBits>();
-    QSerialPort::StopBits stopBits = vsb.value<QSerialPort::StopBits>();
-    QSerialPort::Parity parity = vp.value<QSerialPort::Parity>();
-
     bool update = ui->cbxUpdateDevice->isChecked();
+    m_config.mbconf.m_portName = vcp.value<QSerialPortInfo>().portName();
+    m_config.mbconf.m_baudRate = vb.value<QSerialPort::BaudRate>();
+    m_config.mbconf.m_dataBits = vdb.value<QSerialPort::DataBits>();
+    m_config.mbconf.m_stopBits = vsb.value<QSerialPort::StopBits>();
+    m_config.mbconf.m_parity = vp.value<QSerialPort::Parity>();
 
     switch (vd.value<int>()) {
         case 1: {
             if (m_rly) {
-                m_rly->setPortName(portName);
-                m_rly->setDataBits(dataBits);
-                m_rly->setStopBits(stopBits);
-                m_rly->setBaudRate(rate, update);
-                m_rly->setParity(parity, update);
+                m_rly->setPortName(m_config.mbconf.m_portName);
+                m_rly->setDataBits(m_config.mbconf.m_dataBits);
+                m_rly->setStopBits(m_config.mbconf.m_stopBits);
+                m_rly->setBaudRate(m_config.mbconf.m_baudRate, update);
+                m_rly->setParity(m_config.mbconf.m_parity, update);
             }
             break;
         }
         case 2: {
             if (m_adc) {
-                m_adc->setPortName(portName);
-                m_adc->setDataBits(dataBits);
-                m_adc->setStopBits(stopBits);
-                m_adc->setBaudRate(rate, update);
-                m_adc->setParity(parity, update);
+                m_adc->setPortName(m_config.mbconf.m_portName);
+                m_adc->setDataBits(m_config.mbconf.m_dataBits);
+                m_adc->setStopBits(m_config.mbconf.m_stopBits);
+                m_adc->setBaudRate(m_config.mbconf.m_baudRate, update);
+                m_adc->setParity(m_config.mbconf.m_parity, update);
             }
             break;
         }
@@ -585,6 +707,8 @@ void MainWindow::on_pbSetBaudRate_clicked()
             break;
         }
     }
+
+    saveConfig();
 }
 
 void MainWindow::on_pbR1_clicked()
