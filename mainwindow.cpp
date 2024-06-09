@@ -681,14 +681,28 @@ void MainWindow::on_pbSetChannelType_clicked()
 
 void MainWindow::on_pbOpenPort_clicked()
 {
-    if (!m_modbus.isOpen()) {
-        m_modbus.open();
+    if (m_rly) {
+        if (!m_rly->isValidModbus()) {
+            m_rly->open();
+        }
+    }
+    if (m_adc) {
+        if (!m_adc->isValidModbus()) {
+            m_adc->open();
+        }
     }
 }
 
 void MainWindow::on_pbClosePort_clicked()
 {
-    if (m_modbus.isOpen()) {
-        m_modbus.close();
+    if (m_rly) {
+        if (m_rly->isValidModbus()) {
+            m_rly->close();
+        }
+    }
+    if (m_adc) {
+        if (m_adc->isValidModbus()) {
+            m_adc->close();
+        }
     }
 }
