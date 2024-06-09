@@ -44,16 +44,16 @@ public:
 private slots:
     void onAppQuit();
     /* -- */
-    void onRelayDriverOpend();
-    void onRelayDriverClosed();
-    void onRelayFunctionDone(uint function);
+    void onRelayDriverOpend(quint8 address);
+    void onRelayDriverClosed(quint8 address);
+    void onRelayFunctionDone(quint8 address, uint function);
     void onRelayChanged(quint8 relay, bool state);
     void onRelayModeChanged(quint8 relay, WSRelayDigInMbRtu::TControlMode mode);
     void onDigInChanged(quint8 channel, bool state);
     /* -- */
-    void onAdcDriverOpend();
-    void onAdcDriverClosed();
-    void onAdcFunctionDone(uint function);
+    void onAdcDriverOpend(quint8 address);
+    void onAdcDriverClosed(quint8 address);
+    void onAdcFunctionDone(quint8 address, uint function);
     void onAInTypeChanged(quint8 channel, WSAnalogInMbRtu::TChannelType type);
     void onAInValueChanged(quint8 channel, float value);
 

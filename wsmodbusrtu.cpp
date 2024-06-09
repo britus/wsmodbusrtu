@@ -89,7 +89,7 @@ void WSModbusRtu::setQueryInterval(uint interval)
     if (m_interval != interval) {
         m_interval = interval;
         /* notify consumer */
-        emit intervalChanged(m_interval);
+        emit intervalChanged(deviceAddress(), m_interval);
     }
 }
 
@@ -367,7 +367,7 @@ void WSModbusRtu::doModbusClosed()
 {
 }
 
-void WSModbusRtu::doModbusError(const int, const QString&)
+void WSModbusRtu::doModbusError(quint8, int, const QString&)
 {
 }
 
@@ -496,7 +496,7 @@ void WSModbusRtu::onModbusOpened()
     m_timer->start();
 
     /* notify consumer */
-    emit opened();
+    emit opened(deviceAddress());
 }
 
 void WSModbusRtu::onModbusClosed()
@@ -513,7 +513,7 @@ void WSModbusRtu::onModbusClosed()
     /* processing by derived classes */
     doModbusClosed();
 
-    emit closed();
+    emit closed(deviceAddress());
 }
 
 void WSModbusRtu::onModbusError(uint server, const int code, const QString& message)
@@ -532,8 +532,10 @@ void WSModbusRtu::onModbusError(uint server, const int code, const QString& mess
         m_timer->deleteLater();
     }
 
+    emit errorOccured(server, code, message);
+
     /* processing by derived classes */
-    doModbusError(code, message);
+    doModbusError(server, code, message);
 }
 
 void WSModbusRtu::onModbusReceived(uint server, const QModbusResponse& resp, const QModbusDataUnit& unit, bool isDataUnit)
@@ -590,7 +592,7 @@ void WSModbusRtu::onModbusComplete(uint server)
         qDebug() << id() << "Modbus complete";
     }
 
-    emit complete(function());
+    emit complete(deviceAddress(), function());
 
     doComplete(function());
 

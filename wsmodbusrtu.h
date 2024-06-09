@@ -74,11 +74,12 @@ public:
     bool isValidModbus() const;
 
 signals:
-    void opened();
-    void closed();
+    void opened(quint8 address);
+    void closed(quint8 address);
+    void errorOccured(quint8 address, int code, const QString& message);
     void addressChanged(quint8 address);
-    void intervalChanged(uint interval);
-    void complete(uint function);
+    void intervalChanged(quint8 address, uint interval);
+    void complete(quint8 address, uint function);
 
 protected:
     bool isTrace(uint mask) const;
@@ -98,7 +99,7 @@ protected:
     virtual bool doMduHoldingRegisters(const QModbusDataUnit& unit);
     virtual void doModbusOpened();
     virtual void doModbusClosed();
-    virtual void doModbusError(const int, const QString&);
+    virtual void doModbusError(quint8 server, int code, const QString& message);
     virtual void doComplete(uint function = RtuUnspecified);
     virtual void doFunction(uint function = RtuUnspecified);
 

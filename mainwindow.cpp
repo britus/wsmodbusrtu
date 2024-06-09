@@ -329,7 +329,7 @@ inline void MainWindow::setRelay(quint8 relay)
     }
 }
 
-void MainWindow::onRelayDriverOpend()
+void MainWindow::onRelayDriverOpend(quint8)
 {
     ui->pbOpenPort->setEnabled(false);
     ui->pbClosePort->setEnabled(true);
@@ -339,7 +339,7 @@ void MainWindow::onRelayDriverOpend()
     on_cbDeviceList_activated(0);
 }
 
-void MainWindow::onRelayDriverClosed()
+void MainWindow::onRelayDriverClosed(quint8)
 {
     ui->pbOpenPort->setEnabled(true);
     ui->pbClosePort->setEnabled(false);
@@ -347,7 +347,7 @@ void MainWindow::onRelayDriverClosed()
     on_cbDeviceList_activated(0);
 }
 
-void MainWindow::onRelayFunctionDone(uint function)
+void MainWindow::onRelayFunctionDone(quint8, uint function)
 {
     // qDebug() << "APPWND:onFunctionDone():" << function;
     if (function == WSModbusRtu::RtuReadVersion)
@@ -401,7 +401,7 @@ void MainWindow::onDigInChanged(quint8 channel, bool state)
 
 // ADC Driver ---------------------------------------------------------------------
 
-void MainWindow::onAdcDriverOpend()
+void MainWindow::onAdcDriverOpend(quint8)
 {
     ui->pbOpenPort->setEnabled(false);
     ui->pbClosePort->setEnabled(true);
@@ -409,7 +409,7 @@ void MainWindow::onAdcDriverOpend()
     on_cbDeviceList_activated(1);
 }
 
-void MainWindow::onAdcDriverClosed()
+void MainWindow::onAdcDriverClosed(quint8)
 {
     ui->pbOpenPort->setEnabled(true);
     ui->pbClosePort->setEnabled(false);
@@ -417,7 +417,7 @@ void MainWindow::onAdcDriverClosed()
     on_cbDeviceList_activated(1);
 }
 
-void MainWindow::onAdcFunctionDone(uint function)
+void MainWindow::onAdcFunctionDone(quint8, uint function)
 {
     // qDebug() << "APPWND:onFunctionDone():" << function;
     if (function == WSModbusRtu::RtuReadVersion)
@@ -469,8 +469,8 @@ void MainWindow::on_pbEnableDevice_clicked()
             connect(m_rly, &WSRelayDigInMbRtu::relayChanged, this, &MainWindow::onRelayChanged);
             connect(m_rly, &WSRelayDigInMbRtu::modeChanged, this, &MainWindow::onRelayModeChanged);
             connect(m_rly, &WSRelayDigInMbRtu::inputChanged, this, &MainWindow::onDigInChanged);
-            onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
-            onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
+            onRelayFunctionDone(m_rly->deviceAddress(), WSRelayDigInMbRtu::RtuReadDeviceAddr);
+            onRelayFunctionDone(m_rly->deviceAddress(), WSRelayDigInMbRtu::RtuReadVersion);
             on_cbDeviceList_activated(ui->cbDeviceList->currentIndex());
             ui->pnlRelay->setEnabled(m_rly->isValidModbus());
             ui->pbSetLinkControl->setEnabled(m_rly->isValidModbus());
@@ -495,8 +495,8 @@ void MainWindow::on_pbEnableDevice_clicked()
             connect(m_adc, &WSAnalogInMbRtu::complete, this, &MainWindow::onAdcFunctionDone);
             connect(m_adc, &WSAnalogInMbRtu::valueChanged, this, &MainWindow::onAInValueChanged);
             connect(m_adc, &WSAnalogInMbRtu::channelChanged, this, &MainWindow::onAInTypeChanged);
-            onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
-            onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
+            onAdcFunctionDone(m_adc->deviceAddress(), WSRelayDigInMbRtu::RtuReadDeviceAddr);
+            onAdcFunctionDone(m_adc->deviceAddress(), WSRelayDigInMbRtu::RtuReadVersion);
             on_cbDeviceList_activated(ui->cbDeviceList->currentIndex());
             ui->pbSetChannelType->setEnabled(m_adc->isValidModbus());
             if (m_modbus.isOpen()) {
@@ -534,8 +534,8 @@ void MainWindow::on_cbDeviceList_activated(int index)
             if (m_rly) {
                 ui->cbxUpdateDevice->setEnabled( //
                    m_rly != nullptr && m_rly->isValidModbus());
-                onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
-                onRelayFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
+                onRelayFunctionDone(m_rly->deviceAddress(), WSRelayDigInMbRtu::RtuReadDeviceAddr);
+                onRelayFunctionDone(m_rly->deviceAddress(), WSRelayDigInMbRtu::RtuReadVersion);
             }
             break;
         }
@@ -550,8 +550,8 @@ void MainWindow::on_cbDeviceList_activated(int index)
             if (m_adc) {
                 ui->cbxUpdateDevice->setEnabled( //
                    m_adc != nullptr && m_adc->isValidModbus());
-                onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadDeviceAddr);
-                onAdcFunctionDone(WSRelayDigInMbRtu::RtuReadVersion);
+                onAdcFunctionDone(m_adc->deviceAddress(), WSRelayDigInMbRtu::RtuReadDeviceAddr);
+                onAdcFunctionDone(m_adc->deviceAddress(), WSRelayDigInMbRtu::RtuReadVersion);
             }
             break;
         }
