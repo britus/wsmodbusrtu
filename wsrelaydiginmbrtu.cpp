@@ -54,7 +54,7 @@ void WSRelayDigInMbRtu::setRelayStatus(const quint8 relay, const bool state)
         qDebug() << id() << "Set relay:" << relay << state;
     }
 
-    if (relay >= maxOutputs()) {
+    if (relay >= maxOutputs() && relay != 0xff) {
         qCritical() << id() << "Invalid relay number:" << relay;
         return;
     }
