@@ -366,10 +366,10 @@ void MainWindow::onRelayChanged(quint8 relay, bool state)
     QString key = tr("pbR%1").arg(relay + 1);
     if ((btn = ui->pnlRelay->findChild<QPushButton*>(key))) {
         if (state) {
-            btn->setStyleSheet("background-color: green;");
+            btn->setDefault(true);
         }
         else {
-            btn->setStyleSheet(QString());
+            btn->setDefault(false);
         }
     }
 }
